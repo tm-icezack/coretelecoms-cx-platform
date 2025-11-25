@@ -1,7 +1,11 @@
-service_account.json
+ service_account.json*
+*.json
+!example.json
+
 # Environment variables and secrets
 .env
 *.env
+
 
 # Terraform state and credentials
 *.tfvars
