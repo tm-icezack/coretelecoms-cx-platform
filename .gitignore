@@ -1,0 +1,19 @@
+service_account.json
+# Environment variables and secrets
+.env
+*.env
+
+# Terraform state and credentials
+*.tfvars
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+
+# Python/Virtual Environment
+venv/
+__pycache__/
+*.pyc
+
+# Local Data/Logs
+*.log
+data/
