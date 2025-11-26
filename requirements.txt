@@ -6,3 +6,6 @@ oauth2client==4.1.3      # Google Sheets authentication (Service Account)
 psycopg2-binary==2.9.9   # Postgres database connector
 python-dotenv==1.0.1     # To securely load environment variables from .env
 SQLAlchemy==2.0.30       # Python SQL toolkit (optional, but good practice)
+# --- DBT TRANSFORMATION LAYER ---
+dbt-duckdb
+duckdb
