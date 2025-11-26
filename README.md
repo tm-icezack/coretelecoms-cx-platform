@@ -1,1 +1,1 @@
-# coretelecoms-cx-platform
+# CoreTelecoms Data Platform
