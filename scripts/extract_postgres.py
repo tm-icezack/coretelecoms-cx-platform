@@ -61,7 +61,8 @@ def extract_and_load_raw_postgres(date_str: str):
 
 if __name__ == "__main__":
     # Use today's date for daily structure (change to a fixed date if your source tables use historical names)
-    TEST_DATE = datetime.now().strftime("%Y-%m-%d") 
+    #TEST_DATE = datetime.now().strftime("%Y-%m-%d") 
+    TEST_DATE = datetime(2025, 11, 20).strftime("%Y-%m-%d")
     
     print(f"\n--- Running Web Forms Pipeline (RAW Load) for {TEST_DATE} ---")
     extract_and_load_raw_postgres(TEST_DATE)

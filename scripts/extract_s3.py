@@ -62,12 +62,13 @@ def extract_and_load_raw_s3(bucket_name, file_key, data_type: str, date_str: str
 
 if __name__ == "__main__":
     SOURCE_BUCKET = 'core-telecoms-data-lake'
-    TEST_DATE = datetime.now().strftime("%Y-%m-%d")
+    #TEST_DATE = datetime.now().strftime("%Y-%m-%d") switched to fixed date for consistency
+    TEST_DATE = datetime(2025, 11, 20).strftime("%Y-%m-%d")
     
     # 1. Customer Data (Static)
-    CUSTOMER_KEY = 'customers/customers_dataset.csv' 
-    print("\n--- Running Customer Data Pipeline (RAW Load) ---")
-    extract_and_load_raw_s3(SOURCE_BUCKET, CUSTOMER_KEY, 'customers')
+    #CUSTOMER_KEY = 'customers/customers_dataset.csv' 
+    #print("\n--- Running Customer Data Pipeline (RAW Load) ---")
+    #extract_and_load_raw_s3(SOURCE_BUCKET, CUSTOMER_KEY, 'customers')
 
     # 2. Call Logs Data (Daily Example)
     CALL_LOG_KEY = f'call logs/call_logs_day_{TEST_DATE}.csv'
