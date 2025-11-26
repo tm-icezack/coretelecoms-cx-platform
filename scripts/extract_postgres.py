@@ -18,7 +18,7 @@ def extract_and_load_raw_postgres(date_str: str):
     """
     # Use underscore for SQL table name format
     table_date = date_str.replace('-', '_')
-    table_name = f"Web_form_request_{table_date}"
+    table_name = f"customer_complaints.web_form_request_{table_date}"
     
     # Use environment variables from .env
     DB_USER = os.getenv('DB_USER')
