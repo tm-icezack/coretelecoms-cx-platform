@@ -1,0 +1,34 @@
+# core_telecoms_dbt/models/sources.yml
+
+version: 2
+
+sources:
+  - name: raw_telecoms
+    database: core_telecoms # The name of the DuckDB database (core_telecoms.duckdb)
+    schema: analytics_db    # The schema (Glue equivalent) we are querying
+    
+    tables:
+      # Source 1: PostgreSQL Extraction (Web Forms)
+      - name: raw_web_forms
+        external:
+          location: "s3://coretelecoms-raw-data-lake-isaac/raw/web_forms/*.parquet"
+      
+      # Source 2: S3 CSV/JSON (Call Logs)
+      - name: raw_call_logs
+        external:
+          location: "s3://coretelecoms-raw-data-lake-isaac/raw/call_logs/*.parquet"
+      
+      # Source 3: S3 CSV/JSON (Social Media)
+      - name: raw_social_media
+        external:
+          location: "s3://coretelecoms-raw-data-lake-isaac/raw/social_media/*.parquet"
+
+      # Source 4: S3 CSV/JSON (Customer Data)
+      - name: raw_customers
+        external:
+          location: "s3://coretelecoms-raw-data-lake-isaac/raw/customers/*.parquet"
+      
+      # Source 5: Google Sheets Extraction (Agents)
+      - name: raw_agents
+        external:
+          location: "s3://coretelecoms-raw-data-lake-isaac/raw/agents/*.parquet"
