@@ -1,22 +1,20 @@
--- models/staging/stg_web_forms.sql
+{{ config(materialized='view') }}
 
 SELECT
-    -- Keys and Identifiers
-    request_id AS request_key,
+   request_id AS request_key,
     "customeR iD" AS customer_key,
     CAST("agent ID" AS VARCHAR) AS agent_key,
 
-    -- Attributes
     "COMPLAINT_catego ry" AS complaint_category,
     resolutionstatus AS resolution_status,
 
-    -- Timestamps
-    CAST(request_date AS TIMESTAMP) AS request_timestamp,
-    CAST(resolution_date AS TIMESTAMP) AS resolution_timestamp,
+    -- FIX: Use NULLIF to handle empty strings (e.g., in resolution_date)
+    CAST(NULLIF(request_date, '') AS TIMESTAMP) AS request_timestamp,
+    CAST(NULLIF(resolution_date, '') AS TIMESTAMP) AS resolution_timestamp,
 
-    -- Metadata
-    CAST(webFormGenerationDate AS DATE) AS dbt_load_date
+    CAST(webFormGenerationDate AS DATE) AS dbt_load_date,
+    filename AS source_file_path
 
-    -- Column1 is dropped
-    
-FROM read_parquet('s3://coretelecoms-raw-data-lake-isaac/raw/web_forms/*.parquet')
+FROM read_parquet(
+    's3://coretelecoms-raw-data-lake-isaac/raw/web_forms/*.parquet'
+)

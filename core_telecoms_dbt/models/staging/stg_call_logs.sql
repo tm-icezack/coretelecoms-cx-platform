@@ -1,4 +1,6 @@
--- models/staging/stg_call_logs.sql
+{{ config(materialized='view') }}
+
+
 
 SELECT
     -- Keys and Identifiers
@@ -13,11 +15,11 @@ SELECT
     -- Timestamps
     CAST(call_start_time AS TIMESTAMP) AS call_timestamp,
     CAST(call_end_time AS TIMESTAMP) AS call_end_timestamp,
-    
-    -- Metadata (for tracking)
-    CAST(callLogsGenerationDate AS DATE) AS dbt_load_date,
 
-    -- Drop the extraneous index column
-    -- "Unnamed: 0" AS __raw_index
-    
-FROM  read_parquet('s3://coretelecoms-raw-data-lake-isaac/raw/call_logs/*.parquet')
+    -- Metadata (tracking lineage)
+    CAST(callLogsGenerationDate AS DATE) AS dbt_load_date,
+    filename AS source_file_path
+
+FROM read_parquet(
+        's3://coretelecoms-raw-data-lake-isaac/raw/call_logs/*.parquet'
+)

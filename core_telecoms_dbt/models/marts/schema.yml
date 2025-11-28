@@ -1,0 +1,35 @@
+# models/marts/schema.yml
+
+version: 2
+
+models:
+  - name: dim_customers
+    description: "A dimension table containing the most recent record for each customer."
+    columns:
+      - name: customer_key
+        description: "The unique identifier for the customer."
+        tests:
+          - unique
+          - not_null
+      
+      - name: signup_date
+        description: "The date the customer signed up."
+        tests:
+          - not_null
+
+  - name: fct_master_interactions
+    description: "A consolidated fact table unifying call logs, social media, and web form interactions."
+    columns:
+      - name: interaction_key
+        description: "The unique primary key for the interaction event."
+        tests:
+          - unique
+          - not_null
+          
+      - name: customer_key
+        description: "Foreign key to the dim_customers table."
+        tests:
+          # This test ensures every customer key in the fact table exists in the dimension table
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key

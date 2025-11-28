@@ -1,36 +1,53 @@
 /*
-# coretelecorms/terraform/iam.tf (COMMENTED OUT FOR LACK OF PERMISSIONS)
+# infra/iam.tf (Corrected and ready for uncommenting when permissions are granted)
 
-## 1. IAM Role Definition
-resource "aws_iam_role" "data_lake_etl_role" {
-  name               = "coretelecoms-data-lake-etl-role"
+## 1. Redshift IAM Role (for S3 COPY access)
+resource "aws_iam_role" "redshift_s3_access_role" {
+  name = "redshift-s3-access-role-coretelecoms"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
         Principal = {
-          Service = "ec2.amazonaws.com" 
+          Service = "redshift.amazonaws.com"
         }
       },
     ]
   })
-  tags = {
-    Project = "CoreTelecorms"
-  }
 }
 
-## 2. IAM Policy Definition
-resource "aws_iam_policy" "data_lake_access_policy" {
-  # ... (Policy definition for S3 access remains here) ...
+## 2. IAM Policy Definition (Grants read access to S3 Data Lakes)
+resource "aws_iam_policy" "redshift_s3_read_policy" {
+  name        = "redshift-s3-read-policy-coretelecoms"
+  description = "Grants read access to the raw and staging data lakes"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        Effect   = "Allow"
+        Resource = [
+          # Add both bucket ARNs here
+          aws_s3_bucket.raw_data_bucket.arn,
+          "${aws_s3_bucket.raw_data_bucket.arn}/*",
+          aws_s3_bucket.staging_data_bucket.arn,
+          "${aws_s3_bucket.staging_data_bucket.arn}/*",
+        ]
+      },
+    ]
+  })
 }
 
 ## 3. Attach Policy to Role
-resource "aws_iam_role_policy_attachment" "etl_role_policy_attachment" {
-  role       = aws_iam_role.data_lake_etl_role.name
-  policy_arn = aws_iam_policy.data_lake_access_policy.arn
+resource "aws_iam_role_policy_attachment" "redshift_s3_read_attachment" {
+  role       = aws_iam_role.redshift_s3_access_role.name
+  policy_arn = aws_iam_policy.redshift_s3_read_policy.arn
 }
-
-*/ 
-# Leave this file commented out until you have permission to create IAM resources.
+*/

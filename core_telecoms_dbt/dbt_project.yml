@@ -44,6 +44,7 @@ models:
     # 2. CONFIG FOR MODELS IN: models/example/
     # --------------------------------------------------------------------------
     example:
+      +enabled: false        # Disable all example models
       +materialized: view   # You can change this later if needed
 
     # --------------------------------------------------------------------------
@@ -53,3 +54,6 @@ models:
     staging:
       +enabled: true         # Explicitly enable all models in models/staging/
       +materialized: view    # Staging models should remain views (best practice)
+
+    marts:
+      +materialized: table  # Data marts should be tables for performance  
