@@ -23,3 +23,11 @@ provider "registry.terraform.io/hashicorp/aws" {
     "zh:ff461571e3f233699bf690db319dfe46aec75e58726636a0d97dd9ac6e32fb70",
   ]
 }
+
+provider "registry.terraform.io/snowflakedb/snowflake" {
+  version     = "2.11.0"
+  constraints = "~> 2.1"
+  hashes = [
+    "h1:50kFmzGtMFnTfC73bble5IW10ayLi2eRsy9MIpGdLtA=",
+  ]
+}
