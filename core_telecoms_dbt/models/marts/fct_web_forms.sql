@@ -2,7 +2,7 @@
 -- Materialized as a table in dbt_project.yml (marts config)
 
 SELECT
-   -- Foreign Keys (FKs) to Dimensions
+    -- Foreign Keys (FKs) to Dimensions
     request_key,
     customer_key,
     agent_key,
@@ -12,8 +12,8 @@ SELECT
     resolution_timestamp,
 
     -- Metrics / Measures
-    -- Calculate resolution time in hours
-    CAST(date_diff('hour', request_timestamp, resolution_timestamp) AS INTEGER) AS resolution_time_hours,
+    -- Calculate resolution time in hours using Snowflake's DATEDIFF function
+    DATEDIFF('hour', request_timestamp, resolution_timestamp) AS resolution_time_hours,
     
     -- Categorical Attributes
     complaint_category,
@@ -22,4 +22,5 @@ SELECT
     -- Audit Columns
     dbt_load_date,
     source_file_path
+
 FROM {{ ref('stg_web_forms') }}

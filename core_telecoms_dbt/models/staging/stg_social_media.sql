@@ -1,23 +1,21 @@
--- models/staging/stg_social_media.sql (Complete, Robust Version)
-
 {{ config(materialized='view') }}
 
 SELECT
-    complaint_id AS complaint_key,
-    "customeR iD" AS customer_key,
-    CAST("agent ID" AS VARCHAR) AS agent_key,
+    -- Keys and Identifiers: Use VALUE:"key" for mixed-case extraction
+    VALUE:complaint_id::STRING AS complaint_key,
+    VALUE:"customeR iD"::STRING AS customer_key,
+    CAST(VALUE:"agent ID"::STRING AS VARCHAR) AS agent_key,
 
-    "COMPLAINT_catego ry" AS complaint_category,
-    resolutionstatus AS resolution_status,
-    media_channel AS platform_type,
+    -- Attributes
+    VALUE:"COMPLAINT_catego ry"::STRING AS complaint_category,
+    VALUE:resolutionstatus::STRING AS resolution_status,
+    VALUE:media_channel::STRING AS platform_type,
 
-    -- Timestamp Fixes: Use NULLIF to convert empty strings ("") to NULL before casting
-    CAST(NULLIF(request_date, '') AS TIMESTAMP) AS request_timestamp,
-    CAST(NULLIF(resolution_date, '') AS TIMESTAMP) AS resolution_timestamp,
+   -- Timestamps
+    CAST(NULLIF(VALUE:request_date::STRING, '') AS TIMESTAMP) AS request_timestamp,
+    CAST(NULLIF(VALUE:resolution_date::STRING, '') AS TIMESTAMP) AS resolution_timestamp,
 
-    CAST(MediaComplaintGenerationDate AS DATE) AS dbt_load_date,
-    filename AS source_file_path -- Alias for auditing
-
-FROM read_parquet(
-    's3://coretelecoms-raw-data-lake-isaac/raw/social_media/*.parquet'
-)
+    -- Dates and Metadata (This is likely line 22)
+    CAST(VALUE:MediaComplaintGenerationDate::STRING AS DATE) AS dbt_load_date,
+    METADATA$FILENAME AS source_file_path
+FROM RAW.SOCIAL_MEDIA_EXT

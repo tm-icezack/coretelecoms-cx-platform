@@ -1,16 +1,16 @@
 {{ config(materialized='view') }}
 
-
 SELECT
-    customer_id AS customer_key,
-    name AS full_name,
-    Gender AS gender,
-    CAST("DATE of biRTH" AS DATE) AS birth_date,
-    CAST(signup_date AS DATE) AS signup_date,
-    email,
-    address AS full_address,
-    filename AS source_file_path
+    -- Use VARIANT parsing (VALUE:"key") and cast to specific types
+    VALUE:customer_id::STRING AS customer_key,
+    VALUE:name::STRING AS full_name,
+    VALUE:Gender::STRING AS gender,
+    CAST(VALUE:"DATE of biRTH"::STRING AS DATE) AS birth_date,
+    CAST(VALUE:signup_date::STRING AS DATE) AS signup_date,
+    VALUE:email::STRING AS email,
+    VALUE:address::STRING AS full_address,
 
-FROM read_parquet(
-    's3://coretelecoms-raw-data-lake-isaac/raw/customers/*.parquet'
-)
+    -- Use METADATA$FILENAME for file path in Snowflake External Tables
+    METADATA$FILENAME AS source_file_path
+
+FROM RAW.CUSTOMERS_EXT

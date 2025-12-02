@@ -12,8 +12,8 @@ SELECT
     resolution_timestamp,
 
     -- Metrics / Measures
-    -- Calculate resolution time in hours
-    CAST(date_diff('hour', request_timestamp, resolution_timestamp) AS INTEGER) AS resolution_time_hours,
+    -- Calculate resolution time in hours using Snowflake's DATEDIFF function
+    DATEDIFF('hour', request_timestamp, resolution_timestamp) AS resolution_time_hours,
     
     -- Categorical Attributes
     complaint_category,
@@ -21,8 +21,8 @@ SELECT
     platform_type,
     
     -- Audit Columns
-    dbt_load_date
-    -- Note: Removed source_file_path, which was in the last error, but you'll want to add it back for completeness!
-    -- If the staging model includes it, add it here: source_file_path
+    dbt_load_date,
+    -- Added the source_file_path back for data lineage auditing
+    source_file_path 
 
 FROM {{ ref('stg_social_media') }}
