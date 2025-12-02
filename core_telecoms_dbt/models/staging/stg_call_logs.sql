@@ -1,25 +1,21 @@
 {{ config(materialized='view') }}
 
-
-
 SELECT
     -- Keys and Identifiers
-    "call ID" AS call_key,
-    "customeR iD" AS customer_key,
-    CAST("agent ID" AS VARCHAR) AS agent_key,
+    VALUE:"call ID"::STRING AS call_key,
+    VALUE:"customeR iD"::STRING AS customer_key,
+    CAST(VALUE:"agent ID"::STRING AS VARCHAR) AS agent_key,
 
     -- Attributes
-    "COMPLAINT_catego ry" AS complaint_category,
-    resolutionstatus AS resolution_status,
+    VALUE:"COMPLAINT_catego ry"::STRING AS complaint_category,
+    VALUE:"resolutionstatus"::STRING AS resolution_status,
 
     -- Timestamps
-    CAST(call_start_time AS TIMESTAMP) AS call_timestamp,
-    CAST(call_end_time AS TIMESTAMP) AS call_end_timestamp,
+    CAST(VALUE:call_start_time::STRING AS TIMESTAMP) AS call_timestamp,
+    CAST(VALUE:call_end_time::STRING AS TIMESTAMP) AS call_end_timestamp,
 
     -- Metadata (tracking lineage)
-    CAST(callLogsGenerationDate AS DATE) AS dbt_load_date,
-    filename AS source_file_path
+    CAST(VALUE:callLogsGenerationDate::STRING AS DATE) AS dbt_load_date,
+    METADATA$FILENAME AS source_file_path -- Note: filename is a metadata column
 
-FROM read_parquet(
-        's3://coretelecoms-raw-data-lake-isaac/raw/call_logs/*.parquet'
-)
+FROM RAW.CALL_LOGS_EXT

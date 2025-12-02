@@ -12,8 +12,9 @@ SELECT
     call_end_timestamp,
 
     -- Fact Attributes / Measures
-    -- Calculate duration in seconds using DuckDB's timestamp subtraction
-    CAST(date_diff('second', call_timestamp, call_end_timestamp) AS INTEGER) AS call_duration_seconds,
+    -- Calculate duration in seconds using Snowflake's DATEDIFF function
+    DATEDIFF('second', call_timestamp, call_end_timestamp) AS call_duration_seconds,
+    
     complaint_category,
     resolution_status,
     
@@ -22,4 +23,3 @@ SELECT
     source_file_path
 
 FROM {{ ref('stg_call_logs') }}
--- A fact table typically doesn't need a WHERE clause unless filtering known bad data.
