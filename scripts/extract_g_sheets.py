@@ -9,7 +9,7 @@ from .s3_utils import upload_dataframe_to_s3
 load_dotenv()
 
 # --- Configuration from Environment ---
-GCP_KEY_FILE_PATH = os.getenv('GCP_SERVICE_KEY_PATH')
+GCP_KEY_FILE_PATH = os.getenv('GCP_SERVICE_KEY_PATH', '/app/service_account.json')
 SPREADSHEET_URL = os.getenv('GOOGLE_SHEET_URL')
 # Uses 'agents' from .env, defaults to 'Sheet1'
 SHEET_NAME = os.getenv('GOOGLE_SHEET_WORKSHEET', 'agents') 
@@ -25,42 +25,47 @@ def extract_and_load_g_sheets(sheet_url: str, worksheet_name: str, key_path: str
 
     print(f"-> Attempting to connect to Google Sheet: {worksheet_name}")
     try:
-        # 1. Authenticate using the service account key file
         gc = gspread.service_account(filename=GCP_KEY_FILE_PATH)
-
-        # 2. Open the spreadsheet by URL
         spreadsheet = gc.open_by_url(sheet_url)
         worksheet = spreadsheet.worksheet(worksheet_name)
-        
-        # 3. Get all data as a list of lists (header row included)
         data = worksheet.get_all_values()
-
-        # 4. Convert to DataFrame
         df = pd.DataFrame(data[1:], columns=data[0])
 
         # --- QUICK TEST LIMIT ---
-        df = df.head(10) 
+        df = df.head(10)
         # ------------------------
-        
+
         print(f"Successfully extracted data from {worksheet_name}. Rows: {len(df)}")
 
-        # 5. Load to Target Raw Data Lake (as Parquet)
-        # Key path is set to 'agents'
         upload_dataframe_to_s3(
             df=df, 
             file_name=SHEET_NAME, 
             key_path=key_path
         )
-        
+
     except Exception as e:
         print(f"❌ Critical Error in Google Sheets ETL for {worksheet_name}: {e}")
-        # Reminder: Ensure the service account email is shared with the Google Sheet.
 
 
-if __name__ == "__main__":
-    print(f"\n--- Running Google Sheets Pipeline ---")
+# ----------------------------------------------------------
+# NEW: run() WRAPPER FOR scripts.main TO IMPORT AND EXECUTE
+# ----------------------------------------------------------
+
+def run():
+    """
+    Entry point for Google Sheets extraction when called from scripts.main
+    """
+    print("\n--- Running Google Sheets Pipeline ---")
     extract_and_load_g_sheets(
         sheet_url=SPREADSHEET_URL,
         worksheet_name=SHEET_NAME,
-        key_path='agents' # Use 'agents' as the S3 folder path
+        key_path='agents'  # Use 'agents' as the S3 folder path
     )
+
+
+# ------------------------------
+# LOCAL TEST RUN
+# ------------------------------
+
+if __name__ == "__main__":
+    run()

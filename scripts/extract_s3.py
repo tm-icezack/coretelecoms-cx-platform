@@ -1,5 +1,3 @@
-# coretelecoms/scripts/extract_s3.py (RAW EXTRACTION ONLY)
-
 import boto3
 import pandas as pd
 import io
@@ -7,12 +5,12 @@ import os
 from .s3_utils import upload_dataframe_to_s3
 from datetime import datetime
 from dotenv import load_dotenv
-# In both extract_postgres.py and extract_s3.py
-
 
 load_dotenv()
 
-# --- NO CLEANING FUNCTIONS REQUIRED FOR RAW LOAD ---
+# -------------------------------
+# RAW S3 EXTRACT & LOAD FUNCTION
+# -------------------------------
 
 def extract_and_load_raw_s3(bucket_name, file_key, data_type: str, date_str: str = None):
     """
@@ -42,40 +40,50 @@ def extract_and_load_raw_s3(bucket_name, file_key, data_type: str, date_str: str
 
         print(f"Successfully extracted RAW {file_key} from Source S3. Rows: {len(df)}")
         
-        # Determine key_path and file_name for S3 loader
+        # Determine upload path
         key_path = data_type 
-        file_name = data_type
-        if date_str:
-            file_name = f"{data_type}_{date_str}"
+        file_name = data_type if not date_str else f"{data_type}_{date_str}"
         
-        # Load the raw DataFrame directly
         upload_dataframe_to_s3(
-            df=df, # Loading the raw DataFrame (no df_cleaned variable)
-            file_name=file_name, 
+            df=df,
+            file_name=file_name,
             key_path=key_path
         )
         
     except Exception as e:
         print(f" Critical Error in {data_type.upper()} RAW ETL for {file_key}: {e}")
 
-# --- TEST EXECUTION ---
 
-if __name__ == "__main__":
+# ----------------------------------------------------------
+# NEW: run() WRAPPER FOR scripts.main TO IMPORT AND EXECUTE
+# ----------------------------------------------------------
+
+def run():
+    """
+    Entry point for S3 RAW extraction when called from scripts.main.
+    """
     SOURCE_BUCKET = 'core-telecoms-data-lake'
-    #TEST_DATE = datetime.now().strftime("%Y-%m-%d") switched to fixed date for consistency
     TEST_DATE = datetime(2025, 11, 20).strftime("%Y-%m-%d")
-    
-    # 1. Customer Data (Static)
-    #CUSTOMER_KEY = 'customers/customers_dataset.csv' 
-    #print("\n--- Running Customer Data Pipeline (RAW Load) ---")
-    #extract_and_load_raw_s3(SOURCE_BUCKET, CUSTOMER_KEY, 'customers')
 
-    # 2. Call Logs Data (Daily Example)
-    CALL_LOG_KEY = f'call logs/call_logs_day_{TEST_DATE}.csv'
+    # --- Customer Data (Static) ---
+    CUSTOMER_KEY = 'customers/customers_dataset.csv'
+    print("\n--- Running Customer Data Pipeline (RAW Load) ---")
+    extract_and_load_raw_s3(SOURCE_BUCKET, CUSTOMER_KEY, 'customers')
+
+    # --- Call Logs ---
     print(f"\n--- Running Call Logs Pipeline (RAW Load) for {TEST_DATE} ---")
+    CALL_LOG_KEY = f'call logs/call_logs_day_{TEST_DATE}.csv'
     extract_and_load_raw_s3(SOURCE_BUCKET, CALL_LOG_KEY, 'call_logs', TEST_DATE)
 
-    # 3. Social Media Data (Daily Example)
-    SOCIAL_KEY = f'social_medias/media_complaint_day_{TEST_DATE}.json'
+    # --- Social Media ---
     print(f"\n--- Running Social Media Pipeline (RAW Load) for {TEST_DATE} ---")
+    SOCIAL_KEY = f'social_medias/media_complaint_day_{TEST_DATE}.json'
     extract_and_load_raw_s3(SOURCE_BUCKET, SOCIAL_KEY, 'social_media', TEST_DATE)
+
+
+# ------------------------------
+# LOCAL TEST RUN
+# ------------------------------
+
+if __name__ == "__main__":
+    run()

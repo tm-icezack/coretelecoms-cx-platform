@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  etl:
+    build: .
+    container_name: coretelecoms_etl
+    env_file:
+      - .env
+    volumes:
+      - ./scripts:/app/scripts
+      - ./service_account.json:/app/service_account.json
+    restart: unless-stopped
+    command: ["python", "-m", "scripts.main"]
+
+  dbt:
+    build: .
+    container_name: coretelecoms_dbt
+    env_file:
+      - .env
+    volumes:
+      - ./core_telecoms_dbt:/app/dbt   # mount your dbt folder
+      - ~/.dbt:/root/.dbt         # mount your dbt profiles
+      - ./service_account.json:/app/service_account.json
+    working_dir: /app/dbt
+    restart: "no"
+    command: ["dbt", "run"]
