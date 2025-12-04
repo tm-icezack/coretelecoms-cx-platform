@@ -9,7 +9,7 @@ The **CoreTelecoms CX Platform** is a robust, production-grade data pipeline des
 - **Production-Grade ELT Solution**  
   Seamlessly ingests data from multiple systems and transforms it for analytics.
 
-- **Resilient Raw Data Layer (AWS S3)**  
+- **Resilient Raw Data Layer (AWS S3 + Terraform)**  
   A secure, scalable landing zone for all raw, unmodeled data.
 
 - **Structured Analytics**  
@@ -51,17 +51,15 @@ The upgraded platform is now a **production-grade ELT solution** that:
 
 - Ingests complex data sources (S3, Postgres, Google Sheets)  
 - Converts all extracted data into **Parquet** for fast, columnar storage  
-- Stores extracted datasets in an **AWS S3 Raw Layer**  
+- Stores extracted datasets in an **AWS S3 Raw Layer** provisioned with **Terraform**
 - Loads and transforms data using **Snowflake + DBT**  
 - Uses **Apache Airflow** for end-to-end automation  
-- Retrieves database credentials securely via **AWS SSM Parameter Store**  
+- Retrieves database credentials securely via **AWS SSM Parameter Store**
+- Containerizes services with **Docker** and publishes images to **Docker Hub**
 
 This design ensures data integrity, auditability, and scalable analytics.
 
 ---
-
-## Project Structure
-
 
 
 ---
@@ -85,6 +83,7 @@ This design ensures data integrity, auditability, and scalable analytics.
 ---
 
 ## Architecture Diagram 
+<img width="595" height="600" alt="Gemini_Generated_Image_1jukg01jukg01juk" src="https://github.com/user-attachments/assets/bf2955df-ff88-4003-907f-2b826bc42b42" />
 
 
 
