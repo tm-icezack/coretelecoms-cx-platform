@@ -25,3 +25,6 @@ __pycache__/
 # Local Data/Logs
 *.log
 data/
+
+core_telecoms_dbt/.user.yml
+core_telecoms_dbt/profiles.yml
