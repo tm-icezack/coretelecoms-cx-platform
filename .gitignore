@@ -28,3 +28,4 @@ data/
 
 core_telecoms_dbt/.user.yml
 core_telecoms_dbt/profiles.yml
+airflow/postgres-data/

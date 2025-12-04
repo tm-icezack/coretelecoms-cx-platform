@@ -9,11 +9,14 @@ from .s3_utils import upload_dataframe_to_s3
 load_dotenv()
 
 # --- Configuration from Environment ---
-GCP_KEY_FILE_PATH = os.getenv('GCP_SERVICE_KEY_PATH', '/app/service_account.json')
+GCP_KEY_FILE_PATH = os.getenv('GCP_SERVICE_KEY_PATH', '/opt/airflow/service_account.json')
 SPREADSHEET_URL = os.getenv('GOOGLE_SHEET_URL')
 # Uses 'agents' from .env, defaults to 'Sheet1'
 SHEET_NAME = os.getenv('GOOGLE_SHEET_WORKSHEET', 'agents') 
 # --------------------------------------
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GCP_KEY_FILE_PATH
+# ----------------------------------------------------------
+# FUNCTION: EXTRACT FROM GOOGLE SHEETS AND LOAD TO S3
 
 def extract_and_load_g_sheets(sheet_url: str, worksheet_name: str, key_path: str):
     """
@@ -32,7 +35,7 @@ def extract_and_load_g_sheets(sheet_url: str, worksheet_name: str, key_path: str
         df = pd.DataFrame(data[1:], columns=data[0])
 
         # --- QUICK TEST LIMIT ---
-        df = df.head(10)
+        #df = df.head(10)
         # ------------------------
 
         print(f"Successfully extracted data from {worksheet_name}. Rows: {len(df)}")

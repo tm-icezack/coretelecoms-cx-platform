@@ -1,26 +1,67 @@
-version: '3.9'
-
 services:
+  airflow-postgres:
+    image: postgres:15
+    container_name: coretelecorms-airflow-postgres-1
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./airflow/postgres-data:/var/lib/postgresql/data
+
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow-webserver
+    depends_on:
+      - airflow-postgres
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__SECRET_KEY: my_super_secret_key_123
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./core_telecoms_dbt:/opt/airflow/dbt
+      - ./service_account.json:/opt/airflow/service_account.json
+      - ./.env:/opt/airflow/.env
+    command: webserver
+    restart: unless-stopped
+
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: airflow-scheduler
+    depends_on:
+      - airflow-webserver
+      - airflow-postgres
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres:5432/airflow
+      AIRFLOW__WEBSERVER__SECRET_KEY: my_super_secret_key_123
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./core_telecoms_dbt:/opt/airflow/dbt
+      - ./service_account.json:/app/service_account.json
+      - ./service_account.json:/opt/airflow/service_account.json
+      - ./.env:/opt/airflow/.env
+    command: scheduler
+    restart: unless-stopped
+
   etl:
-    build: .
-    container_name: coretelecoms_etl
-    env_file:
-      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.etl
+    container_name: coretelecoms-etl
     volumes:
       - ./scripts:/app/scripts
-      - ./service_account.json:/app/service_account.json
-    restart: unless-stopped
-    command: ["python", "-m", "scripts.main"]
-
-  dbt:
-    build: .
-    container_name: coretelecoms_dbt
-    env_file:
-      - .env
-    volumes:
-      - ./core_telecoms_dbt:/app/dbt   # mount your dbt folder
-      - ~/.dbt:/root/.dbt         # mount your dbt profiles
-      - ./service_account.json:/app/service_account.json
-    working_dir: /app/dbt
-    restart: "no"
-    command: ["dbt", "run"]
+      - ./core_telecoms_dbt:/app/dbt
+      - ./airflow/service_account.json:/app/service_account.json
+      - ./.env:/app/.env
+      

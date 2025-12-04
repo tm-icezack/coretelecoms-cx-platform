@@ -35,7 +35,7 @@ def extract_and_load_raw_s3(bucket_name, file_key, data_type: str, date_str: str
             raise ValueError(f"Unsupported file type for {file_key}")
         
         # --- QUICK TEST LIMIT ---
-        df = df.head(10) 
+        #df = df.head(10) 
         # ------------------------
 
         print(f"Successfully extracted RAW {file_key} from Source S3. Rows: {len(df)}")

@@ -51,9 +51,6 @@ models:
     # 3. CONFIG FOR MODELS IN: models/staging/
     # Staging models usually clean and rename raw source columns.
     # --------------------------------------------------------------------------
-    load:
-      +enabled: true
-      +materialized: incremental
 
     staging:
       +enabled: true         # Explicitly enable all models in models/staging/
